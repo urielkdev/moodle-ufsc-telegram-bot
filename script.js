@@ -4,7 +4,12 @@ const puppeteer = require('puppeteer');
 const script = async (username = process.env.MOODLE_USERNAME,
                       password = process.env.MOODLE_PASSWORD) => {
   // const browser = await puppeteer.launch({ headless: false });
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+    ],
+  });
   const page = await browser.newPage();
   await page.goto('https://sistemas.ufsc.br/login?service=http%3A%2F%2Fmoodle.ufsc.br%2Flogin%2Findex.php', { waitUntil: 'networkidle2' });
 
