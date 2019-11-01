@@ -3,8 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "node telegram-bot.js",
+    "dev": "nodemon telegram-bot.js",
+    "script": "node run-script.js"
+  },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "puppeteer": "^2.0.0"
+    "nodemon": "^1.19.4",
+    "puppeteer": "^2.0.0",
+    "telegraf": "^3.33.3"
   }
 }
