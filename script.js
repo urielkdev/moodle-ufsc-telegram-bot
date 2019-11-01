@@ -34,7 +34,6 @@ const script = async (username = process.env.MOODLE_USERNAME,
         title: item.title,
         href: item.href
       }))
-
   });
 
 

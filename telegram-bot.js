@@ -43,6 +43,7 @@ bot.hears([/login (.+)/, '/login'], async (ctx) => {
 
 // /presença
 bot.hears('/presenca', async (ctx) => {
+  return ctx.reply('Preencha o usuário e a senha, digite /help para mais informações!');
   if (!username || !password)
     return ctx.reply('Preencha o usuário e a senha, digite /help para mais informações!');
 
