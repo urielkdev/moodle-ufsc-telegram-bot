@@ -13,6 +13,11 @@ const helpMessage = `
 /presenca   - para ver as porcentagens de presenças sobre sessões anotadas (precisa estar logado)
 `;
 
+const loginMessage = `
+Login registrado com sucesso!
+Para consultar suas presenças use o comando: /presenca
+`;
+
 let username;
 let password;
 
@@ -28,8 +33,10 @@ bot.hears([/login (.+)/, '/login'], async (ctx) => {
     return ctx.reply('Digite o comando no padrão: /login usuarioExemplo senhaExemplo');
  
   ctx.deleteMessage();
-  ctx.reply('----------------------------');
-  ctx.reply('Login registrado com sucesso');
+  await ctx.reply('----------------------------');
+  await ctx.reply('----------------------------');
+  await ctx.reply('----------------------------');
+  ctx.reply(loginMessage);
   username = req[0];
   password = req[1];
 });
@@ -41,7 +48,7 @@ bot.hears('/presenca', async (ctx) => {
 
   ctx.reply('Computando... Aguarde...');
   let messages = await script(username, password);
-  ctx.reply('Porcentagem de presença sobre sessões anotadas:');
+  await ctx.reply('Porcentagem de presença sobre sessões anotadas:');
   messages.map((msg) => ctx.reply(msg));
   
 });

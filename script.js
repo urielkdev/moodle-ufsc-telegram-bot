@@ -2,9 +2,9 @@ require('dotenv').config();
 const puppeteer = require('puppeteer');
 
 const script = async (username = process.env.MOODLE_USERNAME,
-                      password = process.env.MOODLE_PASSWORD) => {
-  // const browser = await puppeteer.launch({ headless: false });
+  password = process.env.MOODLE_PASSWORD) => {
   const browser = await puppeteer.launch({
+    // headless: false,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -16,7 +16,6 @@ const script = async (username = process.env.MOODLE_USERNAME,
   // login
   // await page.type('#username', process.env.MOODLE_USERNAME);
   // await page.type('#password', process.env.MOODLE_PASSWORD);
-  console.log(username, password);
   await page.type('#username', username);
   await page.type('#password', password);
   await Promise.all([
@@ -35,13 +34,13 @@ const script = async (username = process.env.MOODLE_USERNAME,
   )
 
   let promisses = await courses.map(async (course) => {
-    const pagePresence = await browser.newPage();
+
+    let pagePresence = await browser.newPage();
 
     // go to course
     await pagePresence.goto(course.href, { waitUntil: 'networkidle2' });
 
     // go to presence
-    await pagePresence.waitForSelector('li.activity.attendance.modtype_attendance a');
     await Promise.all([
       pagePresence.click('li.activity.attendance.modtype_attendance a'),
       pagePresence.waitForNavigation({ waitUntil: 'networkidle0' })
@@ -62,19 +61,21 @@ const script = async (username = process.env.MOODLE_USERNAME,
         )
         .querySelector('.lastcol').innerText
     );
-    
+
     // format the percent
     let percentValue = percent.replace('%', '');
-    // console.log(`${courses[0].title}: ${percent}% de presença sobre sessões anotadas`);
-    await pagePresence.close()
-    return `${course.title}: ${percentValue}%`;
-    
+    await pagePresence.close();
+    return `${courses[0].title}: ${percentValue}% de presença sobre sessões anotadas`;
+
   });
-  
+
   let res = await Promise.all(promisses);
 
-  await browser.close();
-  
+  // i dont know why, but with this the errors goes away (error in kill process)
+  setTimeout(() => {
+    browser.close();
+  }, 100);
+
   return res;
 };
 
