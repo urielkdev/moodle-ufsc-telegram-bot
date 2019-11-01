@@ -24,14 +24,26 @@ const script = async (username = process.env.MOODLE_USERNAME,
   ]);
 
   // get the courses
-  const courses = await page.evaluate(() =>
-    Array.from(document.querySelector('div .box.generalbox')
-      .querySelectorAll('ul li a'))
+  const courses = await page.evaluate(async () => {
+    let coursesDiv = document.querySelector('div .box.generalbox');
+    if (!coursesDiv)
+      return;
+
+    return await Array.from(coursesDiv.querySelectorAll('ul li a'))
       .map(item => ({
         title: item.title,
         href: item.href
       }))
-  )
+
+  });
+
+
+  if (!courses) {
+    await browser.close();
+    return 'Erro ao logar'
+  }
+
+
 
   let promisses = await courses.map(async (course) => {
 
