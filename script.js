@@ -31,10 +31,9 @@ const script = async (username = process.env.MOODLE_USERNAME,
 
     return await Array.from(coursesDiv.querySelectorAll('ul li a'))
       .map(item => ({
-        title: item.title,
+        title: item.innerText,
         href: item.href
       }))
-
   });
 
 
@@ -53,6 +52,14 @@ const script = async (username = process.env.MOODLE_USERNAME,
     await pagePresence.goto(course.href, { waitUntil: 'networkidle2' });
 
     // go to presence
+    let presenceExists = await pagePresence.evaluate(async () =>
+      await document.querySelector('li.activity.attendance.modtype_attendance a')
+    );
+    if (!presenceExists) {
+      await pagePresence.close();
+      return `${course.title}: não tem o campo de presença`;
+    }
+
     await Promise.all([
       pagePresence.click('li.activity.attendance.modtype_attendance a'),
       pagePresence.waitForNavigation({ waitUntil: 'networkidle0' })
@@ -77,7 +84,7 @@ const script = async (username = process.env.MOODLE_USERNAME,
     // format the percent
     let percentValue = percent.replace('%', '');
     await pagePresence.close();
-    return `${courses[0].title}: ${percentValue}% de presença sobre sessões anotadas`;
+    return `${course.title}: ${percentValue}% de presença sobre sessões anotadas`;
 
   });
 
