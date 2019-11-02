@@ -1,4 +1,4 @@
-create a '.env' file, create the variables: MOODLE_USERNAME and MOODLE_PASSWORD
+create a '.env' file, create the variables: MOODLE_USERNAME, MOODLE_PASSWORD and BOT_TOKEN(create with @BotFather)
 
 instal the dependencies: yarn install
 

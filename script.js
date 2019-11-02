@@ -14,8 +14,6 @@ const script = async (username = process.env.MOODLE_USERNAME,
   await page.goto('https://sistemas.ufsc.br/login?service=http%3A%2F%2Fmoodle.ufsc.br%2Flogin%2Findex.php', { waitUntil: 'networkidle2' });
 
   // login
-  // await page.type('#username', process.env.MOODLE_USERNAME);
-  // await page.type('#password', process.env.MOODLE_PASSWORD);
   await page.type('#username', username);
   await page.type('#password', password);
   await Promise.all([
@@ -36,13 +34,11 @@ const script = async (username = process.env.MOODLE_USERNAME,
       }))
   });
 
-
+  // login error
   if (!courses) {
     await browser.close();
     return 'Erro ao logar'
   }
-
-
 
   let promisses = await courses.map(async (course) => {
 
@@ -55,6 +51,8 @@ const script = async (username = process.env.MOODLE_USERNAME,
     let presenceExists = await pagePresence.evaluate(async () =>
       await document.querySelector('li.activity.attendance.modtype_attendance a')
     );
+
+    // if presence field doesnt exist
     if (!presenceExists) {
       await pagePresence.close();
       return `${course.title}: não tem o campo de presença`;
@@ -83,9 +81,9 @@ const script = async (username = process.env.MOODLE_USERNAME,
 
     // format the percent
     let percentValue = percent.replace('%', '');
+
     await pagePresence.close();
     return `${course.title}: ${percentValue}% de presença sobre sessões anotadas`;
-
   });
 
   let res = await Promise.all(promisses);

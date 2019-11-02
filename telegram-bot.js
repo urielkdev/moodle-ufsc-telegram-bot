@@ -65,7 +65,6 @@ bot.hears('/presenca', async (ctx) => {
     console.log(err);
     ctx.reply('Erro inesperado, verifique seu login, caso o erro persistir contate o suporte');
   }
-  
 });
 
 bot.startWebhook('/secret-path', null, process.env.PORT || 5000);
