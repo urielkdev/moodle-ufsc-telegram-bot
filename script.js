@@ -2,16 +2,18 @@ require('dotenv').config();
 const puppeteer = require('puppeteer');
 
 const script = async (username = process.env.MOODLE_USERNAME,
-                      password = process.env.MOODLE_PASSWORD) => {
-  // const browser = await puppeteer.launch({ headless: false });
-  const browser = await puppeteer.launch();
+  password = process.env.MOODLE_PASSWORD) => {
+  const browser = await puppeteer.launch({
+    // headless: false,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+    ],
+  });
   const page = await browser.newPage();
   await page.goto('https://sistemas.ufsc.br/login?service=http%3A%2F%2Fmoodle.ufsc.br%2Flogin%2Findex.php', { waitUntil: 'networkidle2' });
 
   // login
-  // await page.type('#username', process.env.MOODLE_USERNAME);
-  // await page.type('#password', process.env.MOODLE_PASSWORD);
-  console.log(username, password);
   await page.type('#username', username);
   await page.type('#password', password);
   await Promise.all([
@@ -20,23 +22,42 @@ const script = async (username = process.env.MOODLE_USERNAME,
   ]);
 
   // get the courses
-  const courses = await page.evaluate(() =>
-    Array.from(document.querySelector('div .box.generalbox')
-      .querySelectorAll('ul li a'))
+  const courses = await page.evaluate(async () => {
+    let coursesDiv = document.querySelector('div .box.generalbox');
+    if (!coursesDiv)
+      return;
+
+    return await Array.from(coursesDiv.querySelectorAll('ul li a'))
       .map(item => ({
-        title: item.title,
+        title: item.innerText,
         href: item.href
       }))
-  )
+  });
+
+  // login error
+  if (!courses) {
+    await browser.close();
+    return 'Erro ao logar'
+  }
 
   let promisses = await courses.map(async (course) => {
-    const pagePresence = await browser.newPage();
+
+    let pagePresence = await browser.newPage();
 
     // go to course
     await pagePresence.goto(course.href, { waitUntil: 'networkidle2' });
 
     // go to presence
-    await pagePresence.waitForSelector('li.activity.attendance.modtype_attendance a');
+    let presenceExists = await pagePresence.evaluate(async () =>
+      await document.querySelector('li.activity.attendance.modtype_attendance a')
+    );
+
+    // if presence field doesnt exist
+    if (!presenceExists) {
+      await pagePresence.close();
+      return `${course.title}: não tem o campo de presença`;
+    }
+
     await Promise.all([
       pagePresence.click('li.activity.attendance.modtype_attendance a'),
       pagePresence.waitForNavigation({ waitUntil: 'networkidle0' })
@@ -57,19 +78,21 @@ const script = async (username = process.env.MOODLE_USERNAME,
         )
         .querySelector('.lastcol').innerText
     );
-    
+
     // format the percent
     let percentValue = percent.replace('%', '');
-    // console.log(`${courses[0].title}: ${percent}% de presença sobre sessões anotadas`);
-    await pagePresence.close()
-    return `${course.title}: ${percentValue}%`;
-    
+
+    await pagePresence.close();
+    return `${course.title}: ${percentValue}% de presença sobre sessões anotadas`;
   });
-  
+
   let res = await Promise.all(promisses);
 
-  await browser.close();
-  
+  // i dont know why, but with this the errors goes away (error in kill process)
+  setTimeout(() => {
+    browser.close();
+  }, 100);
+
   return res;
 };
 
