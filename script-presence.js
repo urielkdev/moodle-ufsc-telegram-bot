@@ -31,16 +31,16 @@ const script = async (username = process.env.MOODLE_USERNAME,
       .map(item => ({
         title: item.innerText,
         href: item.href
-      }))
+      }));
   });
 
   // login error
   if (!courses) {
     await browser.close();
-    return 'Erro ao logar'
+    return 'Erro ao logar';
   }
 
-  let promisses = await courses.map(async (course) => {
+  let promisses = await courses.map(async course => {
 
     let pagePresence = await browser.newPage();
 

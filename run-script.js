@@ -9,9 +9,9 @@ const getPresence = async () => {
 
 const getGrade = async () => {
   let resp = await scriptGrade();
-  console.log(resp);
+  resp.map(grade => console.log(`${grade.title}: ${grade.value}`))
   return;
 };
 
 // getPresence();
-// getGrade();
+getGrade();

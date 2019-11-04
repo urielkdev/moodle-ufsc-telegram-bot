@@ -1,6 +1,6 @@
 require('dotenv').config();
 const Telegraf = require('telegraf');
-const script = require('./script-presence');
+const script = require('./presence-script');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
@@ -38,7 +38,7 @@ bot.hears([/login (.+)/, '/login'], async (ctx) => {
   let req = ctx.match[1].split(' ');
   if (req.length !== 2)
     return ctx.reply('Digite o comando no padrão: /login usuarioExemplo senhaExemplo');
- 
+
   ctx.deleteMessage();
   ctx.reply(loginMessage);
 
