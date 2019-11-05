@@ -6,7 +6,7 @@ const script = async (username = process.env.MOODLE_USERNAME,
   courseTitle) => {
 
   const browser = await puppeteer.launch({
-    headless: false,
+    // headless: false,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',

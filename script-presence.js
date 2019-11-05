@@ -17,7 +17,7 @@ const script = async (username = process.env.MOODLE_USERNAME,
   await page.type('#username', username);
   await page.type('#password', password);
   await Promise.all([
-    page.click('[name="submit"'),
+    page.click('[name="submit"]'),
     page.waitForNavigation({ waitUntil: 'networkidle0' })
   ]);
   
