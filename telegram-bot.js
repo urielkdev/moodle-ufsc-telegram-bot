@@ -5,7 +5,7 @@ const Markup = require('telegraf/markup');
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
 const Scene = require('telegraf/scenes/base')
-const { leave } = Stage
+// const { leave } = Stage
 
 const scriptGetCourses = require('./script-get-courses');
 const scriptPresence = require('./script-presence');
@@ -14,12 +14,13 @@ const scriptGrades = require('./script-grade');
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const welcomeMessage = `
-Oi, sou um bot de controle de presença do moodle UFSC.
+Olá, sou um bot utilitário do moodle UFSC.
 Precisa de ajuda? Digite /help
 `;
 const helpMessage = `
-/login usuario senha   - para poder logar no seu moodle
-/presencas   - para ver as porcentagens de presenças sobre sessões anotadas (precisa estar logado)
+/login usuario senha  -  para poder logar no seu moodle
+/presencas  -  para ver as porcentagens de presenças sobre sessões anotadas (precisa estar logado)
+/notas  -  para ver as notas de determinada matéria (precisa estar logado)
 
 contato: urielkindermann@gmail.com
 `;
