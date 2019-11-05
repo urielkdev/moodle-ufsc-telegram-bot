@@ -20,6 +20,17 @@ const script = async (username = process.env.MOODLE_USERNAME,
     page.click('[name="submit"'),
     page.waitForNavigation({ waitUntil: 'networkidle0' })
   ]);
+  
+  // maybe there is some advertise of end of semester or something
+  const advertise = await page.evaluate(async () =>
+    document.querySelector('[name="j_id8:j_id14"]')
+  );
+
+  if (advertise)
+    await Promise.all([
+      page.click('[name="j_id8:j_id14"]'),
+      page.waitForNavigation({ waitUntil: 'networkidle0' })
+    ]);
 
   // get the courses
   const courses = await page.evaluate(async () => {

@@ -134,5 +134,5 @@ bot.use(session())
 bot.use(stage.middleware())
 bot.command('notas', ctx => ctx.scene.enter('gradeScene'))
 
-bot.startWebhook('/secret-path', null, process.env.PORT || 5000);
+// bot.startWebhook('/secret-path', null, process.env.PORT || 5000);
 bot.launch();

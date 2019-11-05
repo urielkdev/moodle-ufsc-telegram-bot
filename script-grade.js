@@ -4,10 +4,9 @@ const puppeteer = require('puppeteer');
 const script = async (username = process.env.MOODLE_USERNAME,
   password = process.env.MOODLE_PASSWORD,
   courseTitle) => {
-  console.log(courseTitle);
 
   const browser = await puppeteer.launch({
-    // headless: false,
+    headless: false,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -20,15 +19,26 @@ const script = async (username = process.env.MOODLE_USERNAME,
   await page.type('#username', username);
   await page.type('#password', password);
   await Promise.all([
-    page.click('[name="submit"'),
+    page.click('[name="submit"]'),
     page.waitForNavigation({ waitUntil: 'networkidle0' })
   ]);
+  
+  // maybe there is some advertise of end of semester or something
+  const advertise = await page.evaluate(async () =>
+    document.querySelector('[name="j_id8:j_id14"]')
+  );
+
+  if (advertise)
+    await Promise.all([
+      page.click('[name="j_id8:j_id14"]'),
+      page.waitForNavigation({ waitUntil: 'networkidle0' })
+    ]);
 
   // get the courses
   const courses = await page.evaluate(async () => {
     let coursesDiv = document.querySelector('div .box.generalbox');
     if (!coursesDiv)
-      return;
+      return
 
     return await Array.from(coursesDiv.querySelectorAll('ul li a'))
       .map(item => ({
@@ -45,8 +55,6 @@ const script = async (username = process.env.MOODLE_USERNAME,
 
   // just for the firsts tests
   course = courses.find(item => item.title === courseTitle);
-  // console.log(course);
-  // console.log(courses.find(item => item.title === courseTitle));
 
   let pageGrade = await browser.newPage();
 
