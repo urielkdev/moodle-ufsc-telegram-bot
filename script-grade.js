@@ -2,7 +2,10 @@ require('dotenv').config();
 const puppeteer = require('puppeteer');
 
 const script = async (username = process.env.MOODLE_USERNAME,
-  password = process.env.MOODLE_PASSWORD) => {
+  password = process.env.MOODLE_PASSWORD,
+  courseTitle) => {
+  console.log(courseTitle);
+
   const browser = await puppeteer.launch({
     // headless: false,
     args: [
@@ -41,8 +44,9 @@ const script = async (username = process.env.MOODLE_USERNAME,
   }
 
   // just for the firsts tests
-  course = courses[2];
-
+  course = courses.find(item => item.title === courseTitle);
+  // console.log(course);
+  // console.log(courses.find(item => item.title === courseTitle));
 
   let pageGrade = await browser.newPage();
 
@@ -68,25 +72,16 @@ const script = async (username = process.env.MOODLE_USERNAME,
 
   // get the grades
   let grades = await pageGrade.evaluate(() => {
-    return Array.from(document.querySelectorAll("td.item.column-grade"))
+    return Array.from(document.querySelectorAll(".column-itemname.item > .gradeitemheader"))
       .map(el => ({
-        title: el.parentElement.querySelector('a').innerText,
-        value: el.innerText
+        title: el.innerText,
+        value: el.parentElement.parentElement.querySelector('td.item.column-grade').innerText
       }));
   });
 
-  await pageGrade.close();
+  // await pageGrade.close();
   await browser.close();
   return grades;
-
-  let res = await Promise.all(promisses);
-
-  // i dont know why, but with this the errors goes away (error in kill process)
-  setTimeout(() => {
-    browser.close();
-  }, 100);
-
-  return res;
 };
 
 module.exports = script;

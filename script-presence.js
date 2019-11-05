@@ -83,7 +83,10 @@ const script = async (username = process.env.MOODLE_USERNAME,
     let percentValue = percent.replace('%', '');
 
     await pagePresence.close();
-    return `${course.title}: ${percentValue}% de presença sobre sessões anotadas`;
+    return {
+      title: course.title,
+      value: percentValue
+    }
   });
 
   let res = await Promise.all(promisses);
